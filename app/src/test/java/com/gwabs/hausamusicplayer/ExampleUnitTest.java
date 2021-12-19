@@ -1,4 +1,4 @@
-package com.gwabs.wakokinal_aminehmana;
+package com.gwabs.hausamusicplayer;
 
 import org.junit.Test;
 
