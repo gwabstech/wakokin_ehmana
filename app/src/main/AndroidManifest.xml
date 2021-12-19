@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gwabs.hausamusicplayer">
 
+
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/playerimg"
@@ -9,8 +11,19 @@
         android:roundIcon="@id/imgmusicImage"
         android:supportsRtl="true"
         android:theme="@style/Theme.WAKOKINALAMINEHMANA">
-        <activity android:name="com.gwabs.hausamusicplayer.MainActivity" android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" android:screenOrientation="portrait"
-            android:exported="true">
+        <activity
+            android:name=".AboutAlamin"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="false" />
+        <activity
+            android:name=".AboutDev"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
