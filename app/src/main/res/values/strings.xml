@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">WAKOKIN AL-AMIN EHMANA</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="developed_by_gwabstech">Developed by Gwabstech</string>
+    <string name="wakokin_al_amin_ehmana">WAKOKIN AL-AMIN EHMANA</string>
+    <string name="scrensplash">splash</string>
+    <string name="ehmana_tv">Ehmana TV</string>
+    <string name="general">GENERAL</string>
+    <string name="about_al_amin">ABOUT AL-AMIN</string>
+</resources>
