@@ -120,6 +120,9 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                 startActivity(intent);
                 break;
             case R.id.Contactus:
+
+                Intent intent2 = new Intent(getApplicationContext(),AboutDev.class);
+                startActivity(intent2);
                 break;
             case R.id.aboutalamin:
                 Intent intent1 = new Intent(getApplicationContext(),AboutAlamin.class);

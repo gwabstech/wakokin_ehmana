@@ -18,7 +18,14 @@
             <item
                 android:id="@+id/Contactus"
                 android:icon="@drawable/ic_aboutus"
-                android:title="About Develope"
+                android:title="About Developer"
+                />
+
+            <item
+                android:id="@+id/MoreByDev"
+                android:visible="false"
+                android:icon="@drawable/ic_aboutus"
+                android:title="More by Dev"
                 />
 
         </menu>

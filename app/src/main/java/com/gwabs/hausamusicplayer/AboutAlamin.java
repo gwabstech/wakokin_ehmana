@@ -16,7 +16,7 @@ public class AboutAlamin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Element element = new Element();
-        element.setTitle("Contact on Phone");
+        element.setTitle(" Phone");
         element.setValue("+2347068131818");
         element.setIconDrawable(R.drawable.ic_baseline_phone_24);
         element.setOnClickListener(new View.OnClickListener() {
@@ -35,7 +35,7 @@ public class AboutAlamin extends AppCompatActivity {
                 .setImage(R.drawable.playerimg)
                 .setDescription("AL-AMIN is a Hausa musician based in Kaduna State Nigeria")
                 .addItem(element)
-                .addEmail("ehmana@gmail.com")
+                .addEmail("ehmana@gmail.com","Email")
                 .addTwitter("al_ehmana")
                 .addInstagram("al_amin_ehmana")
                 .create();
