@@ -1,17 +1,26 @@
 package com.gwabs.hausamusicplayer;
 
 public class SongModel {
-    String name;
+   private String songNname,songUrl;
 
-    public String getName() {
-        return name;
+    public SongModel(String songName, String songUrl) {
+        this.songNname = songName;
+        this.songUrl = songUrl;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getSongNname() {
+        return songNname;
     }
 
-    public SongModel(String name) {
-        this.name = name;
+    public void setSongNname(String songNname) {
+        this.songNname = songNname;
+    }
+
+    public String getSongUrl() {
+        return songUrl;
+    }
+
+    public void setSongUrl(String songUrl) {
+        this.songUrl = songUrl;
     }
 }

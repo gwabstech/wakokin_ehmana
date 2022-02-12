@@ -25,7 +25,7 @@
             android:layout_gravity="center"
             android:id="@+id/artistName"
             android:textColor="@color/black"
-            android:textStyle="italic"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="WAKOKIN AL-AMIN Ehmana"

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,10 +21,11 @@ import java.util.Objects;
 public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapterViewHolder> {
     Context mContext;
     private ArrayList<JcAudio> SongList;
-    private ArrayList<String> songsname;
+    private ArrayList<SongModel> songsname;
     titleClickListener songeClickListener;
 
-    public audioAdapter(Context mContext, ArrayList<JcAudio> songlist, ArrayList<String> songsname, titleClickListener songeClickListener) {
+
+    public audioAdapter(Context mContext, ArrayList<JcAudio> songlist, ArrayList<SongModel> songsname, titleClickListener songeClickListener) {
         this.mContext = mContext;
         this.SongList = songlist;
         this.songsname = songsname;
@@ -41,7 +43,7 @@ public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapte
     @Override
     public void onBindViewHolder(@NonNull audioAdapterViewHolder holder, int position) {
 
-        holder.songName.setText(songsname.get(position));
+        holder.songName.setText(songsname.get(position).getSongNname());
 
         Objects.requireNonNull(holder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,13 +62,15 @@ public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapte
 
 
     public static class audioAdapterViewHolder extends RecyclerView.ViewHolder {
-        ImageView songImage;
-        TextView songName;
+       private ImageView songImage;
+       private TextView songName;
+       private ProgressBar progressBar;
 
         public audioAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             songImage = itemView.findViewById(R.id.imgmusicImage);
             songName = itemView.findViewById(R.id.songName);
+            progressBar = itemView.findViewById(R.id.progressBar);
         }
     }
 }
