@@ -54,17 +54,15 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity  implements JcPlayerManagerListener, NavigationView.OnNavigationItemSelectedListener {
+public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerListener, NavigationView.OnNavigationItemSelectedListener {
 
     private ArrayList<JcAudio> Songlist;
     private ArrayList<SongModel> songsArrayList;
     private RecyclerView recyclerView;
     private String url;
     private android.content.Context Context;
-    private DatabaseReference myreff;
     private JcPlayerView player;
     audioAdapter audioAdapter;
-    private Fetch fetch;
     private ProgressBar progressBar;
 
 
@@ -81,14 +79,31 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        myreff = FirebaseDatabase.getInstance().getReference();
         getSupportActionBar().setTitle(" WAKOKIN AL-AMIN");
         player = findViewById(R.id.jcplayer);
         songsArrayList= new ArrayList<>();
 
+        Songlist = new ArrayList<>();
+
+        File files = getExternalFilesDir(getString(R.string.app_name));
+        File[] file = files.listFiles();
+
+        for (File file1 : file){
+            Songlist.add(JcAudio.createFromFilePath(file1.getName(),file1.getPath()));
+           String name = file1.getName();
+           SongModel songModel = new SongModel(name,"");
+           songsArrayList.add(songModel);
+        }
+        player.initPlaylist(Songlist, null);
+
+
+
+
+
+
         DrawerLayout drawerLayout = findViewById(R.id.drawer);
         NavigationView navView = findViewById(R.id.navView);
-        navView.setNavigationItemSelectedListener(MainActivity.this);
+        navView.setNavigationItemSelectedListener(Offline_mode.this);
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, (R.string.open), (R.string.close));
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -100,33 +115,51 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayout = new LinearLayoutManager(Context, RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayout);
-        getDataFromFirebase("EaskPneUFjgmd7NG8W3RNCjP6aR2",myreff);
+        audioAdapter = new audioAdapter(this, Songlist, songsArrayList, true, new titleClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
 
+                player.createNotification(R.drawable.headerimg);
+                player.playAudio(player.getMyPlaylist().get(position));
 
+            }
+        });
+
+        recyclerView.setAdapter(audioAdapter);
+        audioAdapter.notifyDataSetChanged();
 
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(true);
 
     }
 
-/*
+
     private void addsongsname() {
         Songlist = new ArrayList<>();
 
         for (int i = 0 ; i < songsArrayList.size(); i++){
 
             Songlist.add(JcAudio.createFromURL(songsArrayList.get(i).getSongNname(),songsArrayList.get(i).getSongUrl()));
-            Songlist.add(JcAudio.)
+            // Songlist.add(JcAudio.)
         }
 
+        /*
+        Songlist.add(JcAudio.createFromAssets("HALIMATU SADIYYA", "HALIMATU SADIYYA.mp3"));
+        Songlist.add(JcAudio.createFromAssets("MATA ADON GARI", "MATA ADON GARI-1.mp3"));
+        Songlist.add(JcAudio.createFromAssets("NA FADA", "NA FADA.mp3"));
+        Songlist.add(JcAudio.createFromAssets("Ni Daban Ne", "Ni Daban Ne.mp3"));
+        Songlist.add(JcAudio.createFromAssets("No More Shaye Shaye", "No More Shaye Shaye_eq.mp3"));
+        Songlist.add(JcAudio.createFromAssets("RABIN RAINA", "RABIN RAINA.mp3"));
+        Songlist.add(JcAudio.createFromAssets("SALATIN ANNABI", "SALATIN ANNABI.mp3"));
+        Songlist.add(JcAudio.createFromAssets("Tamburan Masoya", "Tamburan Masoya.mp3"));
+        Songlist.add(JcAudio.createFromAssets("UWA BA DA MAMA ", "UWA BA DA MAMA .mp3"));
+        Songlist.add(JcAudio.createFromAssets("WAI YA NE", "WAI YA NE.mp3"));
 
+
+         */
         player.initPlaylist(Songlist, null);
 
 
     }
-
-     */
-
-
 
 
     @Override
@@ -157,6 +190,7 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
 
 
+    /*
     public void getDataFromFirebase(String sunandata,DatabaseReference myreff){
 
         Query query  = myreff.child(sunandata);
@@ -181,7 +215,7 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                     Songlist.add(JcAudio.createFromURL(songsArrayList.get(i).getSongNname(),songsArrayList.get(i).getSongUrl()));
                 }
 
-                audioAdapter = new audioAdapter(Context,Songlist,songsArrayList,false, new titleClickListener() {
+                audioAdapter = new audioAdapter(Context,Songlist,songsArrayList,true, new titleClickListener() {
                     @Override
                     public void onItemClick(View itemView, int position) {
                         progressBar = itemView.findViewById(R.id.progressBar);
@@ -189,7 +223,7 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                         btnDownload.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Toast.makeText(MainActivity.this, "am clicked", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Offline_mode.this, "am clicked", Toast.LENGTH_SHORT).show();
                                 downloadFile(songsArrayList.get(position).getSongUrl(),songsArrayList.get(position).getSongNname());
                             }
                         });
@@ -219,6 +253,8 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
 
     }
+
+     */
     @Override
     public void onPause() {
         super.onPause();
@@ -273,142 +309,6 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
     }
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
 
 
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            if (msg.what == UPDATE_DOWNLOAD_PROGRESS) {
-                int downloadProgress = msg.arg1;
-
-                // Update your progress bar here.
-                progressBar.setProgress(downloadProgress,true);
-            }
-            return true;
-        }
-    });
-
-    public void downloadFile(String Url,String fileName){
-
-        /*
-        FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
-                .setDownloadConcurrentLimit(3)
-                .build();
-
-        fetch = Fetch.Impl.getInstance(fetchConfiguration);
-
-
-        String url = "http:www.example.com/test.txt";
-        String file = "/downloads/test.txt";
-
-        final Request request = new Request(url, file);
-        request.setPriority(Priority.HIGH);
-        request.setNetworkType(NetworkType.ALL);
-        request.addHeader("clientKey", "SD78DF93_3947&MVNGHE1WONG");
-
-        fetch.enqueue(request, updatedRequest -> {
-            //Request was successfully enqueued for download.
-        }, error -> {
-            //An error occurred enqueuing the request.
-        });
-
-         */
-
-
-        String fileExtension = MimeTypeMap.getFileExtensionFromUrl(Url);
-
-// concatinate above fileExtension to fileName
-
-
-        fileName += ".mp3";
-
-        ArrayList<String> songsNames = new ArrayList<>();
-
-        File files = getExternalFilesDir(getString(R.string.app_name));
-        File[] file = files.listFiles();
-        for (File file1 : file){
-            Log.i("File",file1.getName().toString());
-            songsNames.add(file1.getName().toString());
-
-        }
-
-
-        if (songsNames.contains(fileName)){
-            Toast.makeText(this, "File Already Exist", Toast.LENGTH_SHORT).show();
-        }else {
-
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Url))
-                    .setTitle(fileName)
-                    .setDescription("Downloading " + fileName)
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                    .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
-                    //.setDestinationUri(Uri.fromFile(new File(destinationDirectory,fileName + fileExtension)));
-                    .setDestinationInExternalFilesDir(this,getString(R.string.app_name),fileName);
-            //.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-
-
-            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-            long downloadId = dm.enqueue(request);
-
-
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-
-                    int progress = 0;
-                    boolean isDownloadFinished = false;
-                    while (!isDownloadFinished) {
-                        Cursor cursor = dm.query(new DownloadManager.Query().setFilterById(downloadId));
-                        if (cursor.moveToFirst()) {
-                            @SuppressLint("Range") int downloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                            switch (downloadStatus) {
-                                case DownloadManager.STATUS_RUNNING:
-                                    @SuppressLint("Range") long totalBytes = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                                    if (totalBytes > 0) {
-                                        @SuppressLint("Range") long downloadedBytes = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                                        progress = (int) (downloadedBytes * 100 / totalBytes);
-                                    }
-
-                                    break;
-                                case DownloadManager.STATUS_SUCCESSFUL:
-                                    progress = 100;
-                                    isDownloadFinished = true;
-                                    executor.shutdown();
-                                    mainHandler.removeCallbacksAndMessages(null);
-                                    break;
-                                case DownloadManager.STATUS_PAUSED:
-                                case DownloadManager.STATUS_PENDING:
-                                    break;
-                                case DownloadManager.STATUS_FAILED:
-                                    isDownloadFinished = true;
-                                    break;
-                            }
-                            Message message = Message.obtain();
-                            message.what = UPDATE_DOWNLOAD_PROGRESS;
-                            message.arg1 = progress;
-                            mainHandler.sendMessage(message);
-                        }
-                    }
-                }
-            });
-        }
-
-
-    }
-
-    private void getMusicFromFile(){
-
-    }
-
-    private static String getFilenameWithoutExtension(File file) throws IOException {
-        String filename = file.getCanonicalPath();
-        String filenameWithoutExtension;
-        if (filename.contains("."))
-            filenameWithoutExtension = filename.substring(filename.lastIndexOf(System.getProperty("file.separator"))+1, filename.lastIndexOf('.'));
-        else
-            filenameWithoutExtension = filename.substring(filename.lastIndexOf(System.getProperty("file.separator"))+1);
-
-        return filenameWithoutExtension;
-    }
 }

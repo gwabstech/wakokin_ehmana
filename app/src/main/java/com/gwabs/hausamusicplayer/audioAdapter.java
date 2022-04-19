@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,18 +20,22 @@ import java.util.Objects;
 
 
 public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapterViewHolder> {
+
     Context mContext;
     private ArrayList<JcAudio> SongList;
     private ArrayList<SongModel> songsname;
     titleClickListener songeClickListener;
+    private boolean fromOfflineMode;
 
 
-    public audioAdapter(Context mContext, ArrayList<JcAudio> songlist, ArrayList<SongModel> songsname, titleClickListener songeClickListener) {
+    public audioAdapter(Context mContext, ArrayList<JcAudio> songlist, ArrayList<SongModel> songsname ,boolean fromOfflineMode,titleClickListener songeClickListener) {
         this.mContext = mContext;
         this.SongList = songlist;
         this.songsname = songsname;
+        this.fromOfflineMode = fromOfflineMode;
         this.songeClickListener = songeClickListener;
     }
+
 
 
     @NonNull
@@ -44,6 +49,9 @@ public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapte
     public void onBindViewHolder(@NonNull audioAdapterViewHolder holder, int position) {
 
         holder.songName.setText(songsname.get(position).getSongNname());
+        if (fromOfflineMode){
+            holder.btn_download.setVisibility(View.GONE);
+        }
 
         Objects.requireNonNull(holder).itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,12 +73,14 @@ public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapte
        private ImageView songImage;
        private TextView songName;
        private ProgressBar progressBar;
+       private ImageButton btn_download;
 
         public audioAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             songImage = itemView.findViewById(R.id.imgmusicImage);
             songName = itemView.findViewById(R.id.songName);
             progressBar = itemView.findViewById(R.id.progressBar);
+            btn_download = itemView.findViewById(R.id.btnDownload);
         }
     }
 }
