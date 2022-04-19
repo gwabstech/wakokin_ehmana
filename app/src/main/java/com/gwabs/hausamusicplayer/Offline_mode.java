@@ -85,16 +85,6 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
 
         Songlist = new ArrayList<>();
 
-        File files = getExternalFilesDir(getString(R.string.app_name));
-        File[] file = files.listFiles();
-
-        for (File file1 : file){
-            Songlist.add(JcAudio.createFromFilePath(file1.getName(),file1.getPath()));
-           String name = file1.getName();
-           SongModel songModel = new SongModel(name,"");
-           songsArrayList.add(songModel);
-        }
-        player.initPlaylist(Songlist, null);
 
 
 
@@ -115,51 +105,43 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayout = new LinearLayoutManager(Context, RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayout);
-        audioAdapter = new audioAdapter(this, Songlist, songsArrayList, true, new titleClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
 
-                player.createNotification(R.drawable.headerimg);
-                player.playAudio(player.getMyPlaylist().get(position));
+        try{
 
+            File files = getExternalFilesDir(getString(R.string.app_name));
+            File[] file = files.listFiles();
+
+            for (File file1 : file){
+                Songlist.add(JcAudio.createFromFilePath(file1.getName(),file1.getPath()));
+                String name = file1.getName();
+                SongModel songModel = new SongModel(name,"");
+                songsArrayList.add(songModel);
             }
-        });
+            player.initPlaylist(Songlist, null);
 
-        recyclerView.setAdapter(audioAdapter);
-        audioAdapter.notifyDataSetChanged();
+
+            audioAdapter = new audioAdapter(this, Songlist, songsArrayList, true, new titleClickListener() {
+                @Override
+                public void onItemClick(View itemView, int position) {
+
+                    player.createNotification(R.drawable.headerimg);
+                    player.playAudio(player.getMyPlaylist().get(position));
+
+                }
+            });
+
+            recyclerView.setAdapter(audioAdapter);
+            audioAdapter.notifyDataSetChanged();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this, "No Song found ", Toast.LENGTH_SHORT).show();
+        }
 
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(true);
 
     }
 
-
-    private void addsongsname() {
-        Songlist = new ArrayList<>();
-
-        for (int i = 0 ; i < songsArrayList.size(); i++){
-
-            Songlist.add(JcAudio.createFromURL(songsArrayList.get(i).getSongNname(),songsArrayList.get(i).getSongUrl()));
-            // Songlist.add(JcAudio.)
-        }
-
-        /*
-        Songlist.add(JcAudio.createFromAssets("HALIMATU SADIYYA", "HALIMATU SADIYYA.mp3"));
-        Songlist.add(JcAudio.createFromAssets("MATA ADON GARI", "MATA ADON GARI-1.mp3"));
-        Songlist.add(JcAudio.createFromAssets("NA FADA", "NA FADA.mp3"));
-        Songlist.add(JcAudio.createFromAssets("Ni Daban Ne", "Ni Daban Ne.mp3"));
-        Songlist.add(JcAudio.createFromAssets("No More Shaye Shaye", "No More Shaye Shaye_eq.mp3"));
-        Songlist.add(JcAudio.createFromAssets("RABIN RAINA", "RABIN RAINA.mp3"));
-        Songlist.add(JcAudio.createFromAssets("SALATIN ANNABI", "SALATIN ANNABI.mp3"));
-        Songlist.add(JcAudio.createFromAssets("Tamburan Masoya", "Tamburan Masoya.mp3"));
-        Songlist.add(JcAudio.createFromAssets("UWA BA DA MAMA ", "UWA BA DA MAMA .mp3"));
-        Songlist.add(JcAudio.createFromAssets("WAI YA NE", "WAI YA NE.mp3"));
-
-
-         */
-        player.initPlaylist(Songlist, null);
-
-
-    }
 
 
     @Override
