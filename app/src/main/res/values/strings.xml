@@ -7,5 +7,7 @@
     <string name="scrensplash">splash</string>
     <string name="ehmana_tv">Ehmana TV</string>
     <string name="general">GENERAL</string>
+    <string name = "offline_mode">Download</string>
+    <string name = "exits">Exit</string>
     <string name="about_al_amin">ABOUT AL-AMIN</string>
 </resources>

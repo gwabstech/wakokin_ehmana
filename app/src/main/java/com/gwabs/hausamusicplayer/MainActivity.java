@@ -7,11 +7,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,27 +42,22 @@ import com.google.firebase.database.ValueEventListener;
 import com.tonyodev.fetch2.Fetch;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity  implements JcPlayerManagerListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements JcPlayerManagerListener, NavigationView.OnNavigationItemSelectedListener {
 
     private ArrayList<JcAudio> Songlist;
     private ArrayList<SongModel> songsArrayList;
     private RecyclerView recyclerView;
     private String url;
-    private android.content.Context Context;
     private DatabaseReference myreff;
     private JcPlayerView player;
     audioAdapter audioAdapter;
-    private Fetch fetch;
+
     private ProgressBar progressBar;
 
 
@@ -82,9 +75,10 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         myreff = FirebaseDatabase.getInstance().getReference();
-        getSupportActionBar().setTitle(" WAKOKIN AL-AMIN");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Wakokin Ehmana");
         player = findViewById(R.id.jcplayer);
-        songsArrayList= new ArrayList<>();
+        player.setVisibility(View.VISIBLE);
+        songsArrayList = new ArrayList<>();
 
         DrawerLayout drawerLayout = findViewById(R.id.drawer);
         NavigationView navView = findViewById(R.id.navView);
@@ -98,12 +92,11 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayout = new LinearLayoutManager(Context, RecyclerView.VERTICAL, false);
+        LinearLayoutManager linearLayout = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayout);
-        getDataFromFirebase("EaskPneUFjgmd7NG8W3RNCjP6aR2",myreff);
+        getDataFromFirebase("EaskPneUFjgmd7NG8W3RNCjP6aR2", myreff);
 
-
-
+       player.setJcPlayerManagerListener(this);
         ((SimpleItemAnimator) Objects.requireNonNull(recyclerView.getItemAnimator())).setSupportsChangeAnimations(true);
 
     }
@@ -127,8 +120,6 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
      */
 
 
-
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -140,48 +131,49 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                 break;
             case R.id.Contactus:
 
-                Intent intent2 = new Intent(getApplicationContext(),AboutDev.class);
+                Intent intent2 = new Intent(getApplicationContext(), AboutDev.class);
                 startActivity(intent2);
                 break;
             case R.id.aboutalamin:
-                Intent intent1 = new Intent(getApplicationContext(),AboutAlamin.class);
+                Intent intent1 = new Intent(getApplicationContext(), AboutAlamin.class);
                 startActivity(intent1);
 
                 break;
 
             case R.id.Close:
+                this.finish();
                 finishAffinity();
+                player.kill();
         }
         return true;
     }
 
 
+    public void getDataFromFirebase(String sunandata, DatabaseReference myreff) {
 
-    public void getDataFromFirebase(String sunandata,DatabaseReference myreff){
-
-        Query query  = myreff.child(sunandata);
+        Query query = myreff.child(sunandata);
         query.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
                     String songName = snapshot.child("fileName").getValue().toString();
                     String songUrl = snapshot.child("fileURL").getValue().toString();
-                    SongModel songModel = new SongModel(songName,songUrl);
+                    SongModel songModel = new SongModel(songName, songUrl);
                     songsArrayList.add(songModel);
-                    Log.i("TAG",snapshot.toString());
+                    Log.i("TAG", snapshot.toString());
                 }
 
                 Songlist = new ArrayList<>();
 
-                for (int i = 0 ; i < songsArrayList.size(); i++){
+                for (int i = 0; i < songsArrayList.size(); i++) {
 
-                    Songlist.add(JcAudio.createFromURL(songsArrayList.get(i).getSongNname(),songsArrayList.get(i).getSongUrl()));
+                    Songlist.add(JcAudio.createFromURL(songsArrayList.get(i).getSongNname(), songsArrayList.get(i).getSongUrl()));
                 }
 
-                audioAdapter = new audioAdapter(Context,Songlist,songsArrayList,false, new titleClickListener() {
+                audioAdapter = new audioAdapter(MainActivity.this, Songlist, songsArrayList, false, new titleClickListener() {
                     @Override
                     public void onItemClick(View itemView, int position) {
                         progressBar = itemView.findViewById(R.id.progressBar);
@@ -190,7 +182,7 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                             @Override
                             public void onClick(View v) {
                                 Toast.makeText(MainActivity.this, "am clicked", Toast.LENGTH_SHORT).show();
-                                downloadFile(songsArrayList.get(position).getSongUrl(),songsArrayList.get(position).getSongNname());
+                                downloadFile(songsArrayList.get(position).getSongUrl(), songsArrayList.get(position).getSongNname());
                             }
                         });
                         player.createNotification(R.drawable.headerimg);
@@ -209,53 +201,54 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 try {
-                    Log.i("error","some issoes please refresh");
-                }catch (Exception e){
+                    Log.i("error", "some issoes please refresh");
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
 
 
-
     }
+
     @Override
     public void onPause() {
         super.onPause();
-        player.createNotification(R.drawable.headerimg);
+        Log.i("Tag","Paused");
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        player.kill();
+       // player.kill();
     }
 
     @Override
     public void onCompletedAudio() {
-
+        player.continueAudio();
     }
-
 
 
     @Override
     public void onJcpError(Throwable throwable) {
-
+        Log.i("Tag",throwable.toString());
     }
 
     @Override
     public void onPaused(JcStatus jcStatus) {
-
+        player.createNotification(R.drawable.headerimg);
     }
 
     @Override
     public void onPlaying(JcStatus jcStatus) {
         player.createNotification(R.drawable.headerimg);
+       // player.createNotification(R.drawable.headerimg);
     }
 
     @Override
     public void onPreparedAudio(JcStatus jcStatus) {
-
+        Log.i("Tag",jcStatus.toString());
     }
 
     @Override
@@ -265,12 +258,11 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
     @Override
     public void onTimeChanged(JcStatus jcStatus) {
-
     }
 
     @Override
     public void onContinueAudio(JcStatus jcStatus) {
-
+        Log.i("Tag",jcStatus.toString());
     }
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
@@ -283,13 +275,13 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                 int downloadProgress = msg.arg1;
 
                 // Update your progress bar here.
-                progressBar.setProgress(downloadProgress,true);
+                progressBar.setProgress(downloadProgress, true);
             }
             return true;
         }
     });
 
-    public void downloadFile(String Url,String fileName){
+    public void downloadFile(String Url, String fileName) {
 
         /*
         FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
@@ -327,16 +319,16 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
         File files = getExternalFilesDir(getString(R.string.app_name));
         File[] file = files.listFiles();
-        for (File file1 : file){
-            Log.i("File",file1.getName().toString());
+        for (File file1 : file) {
+            Log.i("File", file1.getName().toString());
             songsNames.add(file1.getName().toString());
 
         }
 
 
-        if (songsNames.contains(fileName)){
+        if (songsNames.contains(fileName)) {
             Toast.makeText(this, "File Already Exist", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
 
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Url))
                     .setTitle(fileName)
@@ -344,7 +336,7 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                     .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
                     //.setDestinationUri(Uri.fromFile(new File(destinationDirectory,fileName + fileExtension)));
-                    .setDestinationInExternalFilesDir(this,getString(R.string.app_name),fileName);
+                    .setDestinationInExternalFilesDir(this, getString(R.string.app_name), fileName);
             //.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
 
 
@@ -397,18 +389,33 @@ public class MainActivity extends AppCompatActivity  implements JcPlayerManagerL
 
     }
 
-    private void getMusicFromFile(){
-
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        new android.view.MenuInflater(this).inflate(R.menu.op_menu, menu);
+        return (super.onCreateOptionsMenu(menu));
     }
 
-    private static String getFilenameWithoutExtension(File file) throws IOException {
-        String filename = file.getCanonicalPath();
-        String filenameWithoutExtension;
-        if (filename.contains("."))
-            filenameWithoutExtension = filename.substring(filename.lastIndexOf(System.getProperty("file.separator"))+1, filename.lastIndexOf('.'));
-        else
-            filenameWithoutExtension = filename.substring(filename.lastIndexOf(System.getProperty("file.separator"))+1);
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.offline) {
+            try {
+                Intent intent = new Intent(MainActivity.this, Offline_mode.class);
+                startActivity(intent);
+               // finish();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
-        return filenameWithoutExtension;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.i("Tag","Resumed");
+    }
+
+
 }

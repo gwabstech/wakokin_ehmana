@@ -59,8 +59,6 @@ public class audioAdapter  extends RecyclerView.Adapter<audioAdapter.audioAdapte
                 songeClickListener.onItemClick(v,holder.getAdapterPosition());
             }
         });
-
-
     }
 
     @Override

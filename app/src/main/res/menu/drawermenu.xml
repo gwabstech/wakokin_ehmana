@@ -30,7 +30,6 @@
 
             <item
                 android:id="@+id/Close"
-                android:visible="false"
                 android:icon="@drawable/ic_baseline_exit_to_app_24"
                 android:title="Exits"
                 />

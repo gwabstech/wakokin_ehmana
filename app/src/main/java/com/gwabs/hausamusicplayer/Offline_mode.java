@@ -68,10 +68,6 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
 
     private static final int UPDATE_DOWNLOAD_PROGRESS = 1;
 
-    // Use a background thread to check the progress of downloading
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
-
-
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +75,7 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(" WAKOKIN AL-AMIN");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Download");
         player = findViewById(R.id.jcplayer);
         songsArrayList= new ArrayList<>();
 
@@ -124,8 +120,18 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
                 @Override
                 public void onItemClick(View itemView, int position) {
 
-                    player.createNotification(R.drawable.headerimg);
-                    player.playAudio(player.getMyPlaylist().get(position));
+                    if (player.isPlaying()){
+                        player.kill();
+                        player.createNotification(R.drawable.headerimg);
+                        player.setVisibility(View.VISIBLE);
+                        player.playAudio(player.getMyPlaylist().get(position));
+
+                    }else {
+                        player.createNotification(R.drawable.headerimg);
+                        player.setVisibility(View.VISIBLE);
+                        player.playAudio(player.getMyPlaylist().get(position));
+                    }
+                   //
 
                 }
             });
@@ -165,78 +171,14 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
                 break;
 
             case R.id.Close:
+                this.finish();
                 finishAffinity();
+                player.kill();
         }
         return true;
     }
 
 
-
-    /*
-    public void getDataFromFirebase(String sunandata,DatabaseReference myreff){
-
-        Query query  = myreff.child(sunandata);
-        query.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot snapshot:dataSnapshot.getChildren()){
-
-                    String songName = snapshot.child("fileName").getValue().toString();
-                    String songUrl = snapshot.child("fileURL").getValue().toString();
-                    SongModel songModel = new SongModel(songName,songUrl);
-                    songsArrayList.add(songModel);
-                    Log.i("TAG",snapshot.toString());
-                }
-
-                Songlist = new ArrayList<>();
-
-                for (int i = 0 ; i < songsArrayList.size(); i++){
-
-                    Songlist.add(JcAudio.createFromURL(songsArrayList.get(i).getSongNname(),songsArrayList.get(i).getSongUrl()));
-                }
-
-                audioAdapter = new audioAdapter(Context,Songlist,songsArrayList,true, new titleClickListener() {
-                    @Override
-                    public void onItemClick(View itemView, int position) {
-                        progressBar = itemView.findViewById(R.id.progressBar);
-                        ImageButton btnDownload = itemView.findViewById(R.id.btnDownload);
-                        btnDownload.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Toast.makeText(Offline_mode.this, "am clicked", Toast.LENGTH_SHORT).show();
-                                downloadFile(songsArrayList.get(position).getSongUrl(),songsArrayList.get(position).getSongNname());
-                            }
-                        });
-                        player.createNotification(R.drawable.headerimg);
-                        player.playAudio(player.getMyPlaylist().get(position));
-
-                    }
-                });
-                recyclerView.setAdapter(audioAdapter);
-                audioAdapter.notifyDataSetChanged();
-
-
-                player.initPlaylist(Songlist, null);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                try {
-                    Log.i("error","some issoes please refresh");
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
-
-    }
-
-     */
     @Override
     public void onPause() {
         super.onPause();
@@ -246,7 +188,6 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        player.kill();
     }
 
     @Override
@@ -254,43 +195,44 @@ public class Offline_mode extends AppCompatActivity  implements JcPlayerManagerL
 
     }
 
-
-
     @Override
-    public void onJcpError(Throwable throwable) {
+    public void onContinueAudio(@NonNull JcStatus jcStatus) {
 
     }
 
     @Override
-    public void onPaused(JcStatus jcStatus) {
+    public void onJcpError(@NonNull Throwable throwable) {
 
     }
 
     @Override
-    public void onPlaying(JcStatus jcStatus) {
-        player.createNotification(R.drawable.headerimg);
-    }
-
-    @Override
-    public void onPreparedAudio(JcStatus jcStatus) {
+    public void onPaused(@NonNull JcStatus jcStatus) {
 
     }
 
     @Override
-    public void onStopped(JcStatus jcStatus) {
+    public void onPlaying(@NonNull JcStatus jcStatus) {
 
     }
 
     @Override
-    public void onTimeChanged(JcStatus jcStatus) {
+    public void onPreparedAudio(@NonNull JcStatus jcStatus) {
 
     }
 
     @Override
-    public void onContinueAudio(JcStatus jcStatus) {
+    public void onStopped(@NonNull JcStatus jcStatus) {
 
     }
 
+    @Override
+    public void onTimeChanged(@NonNull JcStatus jcStatus) {
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        player.setVisibility(View.VISIBLE);
+    }
 }
